@@ -38,13 +38,20 @@ class SPTCorrector( BaseCorrector ):
     ownerDict = {}
     for row in result['Value']:
       ownerDict[ row[0]["OwnerDN"] ] = row[1]
+    print "OwnerDict=", ownerDict
 
     
     print "AT >>> ownerDict", ownerDict
 
     resultShare = {}
+    minNumber = 1000000000000
+    minOwnerDN = ""
     for ownerDN in ownerDNs:
-      resultShare[ownerDN] = 20 - ownerDict[ownerDN]
+      resultShare[ownerDN] = 0
+      if minNumber > ownerDict[ownerDN]:
+         minNumber = ownerDict[ownerDN]
+         minOwnerDN = ownerDN
+    resultShare[minOwnerDN] = 1 
 
     print "AT >>> resultShare", resultShare
 
