@@ -38,9 +38,6 @@ class SPTCorrector( BaseCorrector ):
     ownerDict = {}
     for row in result['Value']:
       ownerDict[ row[0]["OwnerDN"] ] = row[1]
-    print "OwnerDict=", ownerDict
-
-    
     print "AT >>> ownerDict", ownerDict
 
     resultShare = {}
