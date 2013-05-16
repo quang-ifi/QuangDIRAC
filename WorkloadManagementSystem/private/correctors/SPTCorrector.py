@@ -8,6 +8,7 @@ __RCSID__ = "$Id$"
 
 from DIRAC.WorkloadManagementSystem.private.correctors.BaseCorrector import BaseCorrector
 from DIRAC  import gLogger, S_OK, S_ERROR
+from DIRAC.WorkloadManagementSystem.DB.JobDB import JobDB
 
 class SPTCorrector( BaseCorrector ):
 
@@ -18,4 +19,37 @@ class SPTCorrector( BaseCorrector ):
 
   def initialize( self ):
 
-    print "AT >>> initializing SPTCorrector"
+    self.__jobDB = JobDB() 
+
+    return S_OK()
+
+  def applyCorrection( self, entitiesExpectedShare ):
+ 
+    print "AT >>> entitiesExpectedShare", entitiesExpectedShare
+
+    ownerDNs = entitiesExpectedShare.keys()
+
+    group = self.getGroup()
+    result = self.__jobDB.getCounters( 'Jobs', ['OwnerDN'], { "OwnerGroup":group, "Status":"Waiting" } )
+    if not result['OK']:
+      print "AT >>> result", result
+      return entitiesExpectedShare 
+    
+    ownerDict = {}
+    for row in result['Value']:
+      ownerDict[ row[0]["OwnerDN"] ] = row[1]
+
+    
+    print "AT >>> ownerDict", ownerDict
+
+    resultShare = {}
+    for ownerDN in ownerDNs:
+      resultShare[ownerDN] = 20 - ownerDict[ownerDN]
+
+    print "AT >>> resultShare", resultShare
+
+    return resultShare
+
+  def updateHistoryKnowledge( self ):
+
+    return S_OK()
